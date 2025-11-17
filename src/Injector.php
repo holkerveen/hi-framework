@@ -4,7 +4,6 @@
 namespace Framework;
 
 use Closure;
-use Exception;
 use Psr\Container\ContainerInterface;
 use ReflectionFunction;
 use ReflectionNamedType;
