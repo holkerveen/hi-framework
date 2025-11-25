@@ -2,13 +2,21 @@
 
 namespace Framework\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use Framework\Storage\EntityInterface;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'comments')]
 class Comment implements EntityInterface
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'string')]
     private string $id;
+    #[ORM\Column]
     private string $name;
+    #[ORM\Column]
     private string $email;
+    #[ORM\Column]
     private string $message;
     
     public function setId(string $id) {

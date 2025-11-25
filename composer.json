@@ -7,6 +7,9 @@
     },
     "require": {
         "psr/log": "^3.0",
-        "psr/container": "^2.0"
+        "psr/container": "^2.0",
+        "doctrine/orm": "^3.5",
+        "doctrine/dbal": "^4.3",
+        "symfony/cache": "^7.3"
     }
 }
