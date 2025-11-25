@@ -19,24 +19,20 @@ class CommentController
     }
     
     #[Route('/comments/create')]
-    public function create(): string
+    public function create(Environment $twig): string
     {
-        return "<form action='/comments/post' method='post'>
-            <label style='display:block;'>Name<input name='name'/></label>
-            <label style='display:block;'>Email<input name='email'/></label>
-            <label style='display:block;'>Message<textarea name='message'/></textarea></label>
-            <button>Create</button>
-            </form>";
+        return $twig->render("comments/create.html.twig");
     }
     
     #[Route('/comments/post')]
-    public function post(EntityStorageInterface $store): string {
+    public function post(EntityStorageInterface $store, Environment $twig): string {
         $comment = new Comment();
         $comment->setName($_POST['name']);
         $comment->setEmail($_POST['email']);
         $comment->setMessage($_POST['message']);
         $store->create($comment);
-        return "<h1>Comment created</h1><p><a href='/comments'>to list</a></p>";
+        
+        return $twig->render("comments/post.html.twig");
     }
     
     #[Route('/comments/{id}/edit')]
