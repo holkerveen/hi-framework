@@ -6,30 +6,16 @@ namespace Framework\Controllers;
 use Framework\Attributes\Route;
 use Framework\Entity\Comment;
 use Framework\Storage\EntityStorageInterface;
+use Twig\Environment;
 
 class CommentController
 {
     #[Route('/comments')]
-    public function index(EntityStorageInterface $store): string
+    public function index(EntityStorageInterface $store, Environment $twig): string
     {
         $comments = $store->index(Comment::class);
         $count = count($store->index(Comment::class));
-        $list = "<ul>" . implode("", array_map(function ($c) {
-                return "<li>"
-                    . "id:" . htmlspecialchars($c->getId(), ENT_QUOTES) . "<br>"
-                    . "name:" . htmlspecialchars($c->getName(), ENT_QUOTES) . "<br>"
-                    . "email:" . htmlspecialchars($c->getEmail(), ENT_QUOTES) . "<br>"
-                    . "message:" . nl2br(htmlspecialchars($c->getMessage(), ENT_QUOTES)) . "<br>"
-                    . "<a href='/comments/".htmlspecialchars($c->getId())."/edit'>edit</a>"
-                    . " | <a href='/comments/".htmlspecialchars($c->getId())."/confirm-delete'>delete</a> "
-                    . "</li>";
-            }, $comments)) . "</ul>";
-
-        return "
-            <h1>Comments</h1>
-            <p>Comments found: $count</p>
-            <p><a href='/comments/create'>Create new</a></p>
-            $list";
+        return $twig->render("comments/index.html.twig", compact("comments", "count"));
     }
     
     #[Route('/comments/create')]
