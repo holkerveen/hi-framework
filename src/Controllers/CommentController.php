@@ -21,6 +21,7 @@ class CommentController
                     . "email:" . htmlspecialchars($c->getEmail(), ENT_QUOTES) . "<br>"
                     . "message:" . nl2br(htmlspecialchars($c->getMessage(), ENT_QUOTES)) . "<br>"
                     . "<a href='/comments/".htmlspecialchars($c->getId())."/edit'>edit</a>"
+                    . " | <a href='/comments/".htmlspecialchars($c->getId())."/confirm-delete'>delete</a> "
                     . "</li>";
             }, $comments)) . "</ul>";
 
@@ -71,5 +72,24 @@ class CommentController
         $comment->setMessage($_POST['message']);
         $store->update($comment);
         return "<h1>Comment updated</h1><p><a href='/comments'>to list</a></p>";
+    }
+    
+    #[Route('/comments/{id}/confirm-delete')]
+    public function confirmDelete(string $id, EntityStorageInterface $store): string {
+        $comment = $store->read(Comment::class, $id);
+        return "
+            <p>You are about to delete comment '".htmlspecialchars($comment->getName(), ENT_QUOTES)."', from '".$comment->getEmail()."'. This cannot be undone. Are you sure?</p>
+            <a href=\"/comments\">Cancel</a>
+            <form action='/comments/".htmlspecialchars($comment->getId(), ENT_QUOTES)."/delete' method='post'>
+                <input type='hidden' name='id' value='".htmlspecialchars($id, ENT_QUOTES)."' />
+                <button type='submit'>Delete</button>
+                </form>
+            </form>";
+    }
+
+    #[Route('/comments/{id}/delete')]
+    public function delete(string $id, EntityStorageInterface $store): string {
+        $store->delete($store->read(Comment::class, $id));
+        return "<h1>Comment deleted</h1><p><a href='/comments'>to list</a></p>";
     }
 }

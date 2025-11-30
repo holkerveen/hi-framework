@@ -41,6 +41,7 @@ class DoctrineStorage implements EntityStorageInterface
 
     public function delete(EntityInterface $entity): void
     {
-        throw new Exception("Not implemented");
+        $this->em->remove($entity);
+        $this->em->flush();
     }
 }
