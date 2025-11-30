@@ -29,12 +29,14 @@ class DoctrineStorage implements EntityStorageInterface
 
     public function read(string $type, string $id): EntityInterface
     {
-        throw new Exception("Not implemented");
+        return $this->em->getRepository($type)->find($id);
     }
 
     public function update(EntityInterface $entity): EntityInterface
     {
-        throw new Exception("Not implemented");
+        $this->em->persist($entity);
+        $this->em->flush();
+        return $entity;
     }
 
     public function delete(EntityInterface $entity): void

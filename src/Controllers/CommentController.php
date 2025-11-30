@@ -20,6 +20,7 @@ class CommentController
                     . "name:" . htmlspecialchars($c->getName(), ENT_QUOTES) . "<br>"
                     . "email:" . htmlspecialchars($c->getEmail(), ENT_QUOTES) . "<br>"
                     . "message:" . nl2br(htmlspecialchars($c->getMessage(), ENT_QUOTES)) . "<br>"
+                    . "<a href='/comments/".htmlspecialchars($c->getId())."/edit'>edit</a>"
                     . "</li>";
             }, $comments)) . "</ul>";
 
@@ -49,5 +50,26 @@ class CommentController
         $comment->setMessage($_POST['message']);
         $store->create($comment);
         return "<h1>Comment created</h1><p><a href='/comments'>to list</a></p>";
+    }
+    
+    #[Route('/comments/{id}/edit')]
+    public function edit(string $id, EntityStorageInterface $store): string {
+        $comment = $store->read(Comment::class, $id);
+        return "<form action='/comments/".htmlspecialchars($id, ENT_QUOTES)."/store' method='post'>
+            <label style='display:block;'>Name<input name='name' value='".htmlspecialchars($comment->getName(), ENT_QUOTES)."'/></label>
+            <label style='display:block;'>Email<input name='email' value='".htmlspecialchars($comment->getEmail(), ENT_QUOTES)."'/></label>
+            <label style='display:block;'>Message<textarea name='message'/>".htmlspecialchars($comment->getMessage(),ENT_QUOTES)."</textarea></label>
+            <button>Save</button>
+            </form>";
+    }
+    
+    #[Route('/comments/{id}/store')]
+    public function store(string $id, EntityStorageInterface $store): string {
+        $comment = $store->read(Comment::class, $id);
+        $comment->setName($_POST['name']);
+        $comment->setEmail($_POST['email']);
+        $comment->setMessage($_POST['message']);
+        $store->update($comment);
+        return "<h1>Comment updated</h1><p><a href='/comments'>to list</a></p>";
     }
 }
