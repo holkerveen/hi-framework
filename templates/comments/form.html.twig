@@ -1,0 +1,7 @@
+<form method="POST" action="{{ action }}">
+    <label style="display:block;">Name<input name="name" value="{{ comment.name }}"/></label>
+    <label style="display:block;">Email<input name="email" value="{{ comment.email }}"/></label>
+    <label style="display:block;">Message<textarea name="message">{{ comment.message }}</textarea></label>
+    <a href="/comments">Cancel</a>
+    <button type="submit">Save</button>
+</form>

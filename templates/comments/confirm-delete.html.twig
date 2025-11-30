@@ -1,0 +1,5 @@
+<p>You are about to delete comment '{{ comment.name }}', from '{{ comment.email }}'. This cannot be undone. Are you sure?</p>
+<a href="/comments">Cancel</a>
+<form action="/comments/{{ comment.id }}/delete" method="post">
+    <button type="submit">Delete</button>
+</form>
