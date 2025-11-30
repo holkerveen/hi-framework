@@ -2,6 +2,7 @@
 
 namespace Framework;
 
+use Closure;
 use Framework\Storage\CsvStorage;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntityStorageInterface;
@@ -14,11 +15,14 @@ class Application {
 //        $container->set(EntityStorageInterface::class, fn() => new CsvStorage(dirname(__DIR__).'/csv-files/'));
         $container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
         
-        $path =  parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $requestPath =  parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
-        $router = new Router();
-        $callable = $router->getController($path);
-        
-        return new Injector($container)->call($callable);
+        $router = new Router()->match($requestPath);
+        $closure = Closure::fromCallable([
+            $router->getControllerInstance(),
+            $router->getMethod(),
+        ]);
+
+        return new Injector($container)->call($closure, $router->getParameters());
     }
 }
