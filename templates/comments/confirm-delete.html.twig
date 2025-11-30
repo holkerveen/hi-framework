@@ -1,5 +1,14 @@
-<p>You are about to delete comment '{{ comment.name }}', from '{{ comment.email }}'. This cannot be undone. Are you sure?</p>
-<a href="/comments">Cancel</a>
-<form action="/comments/{{ comment.id }}/delete" method="post">
-    <button type="submit">Delete</button>
-</form>
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Delete Comment</h1>
+    <div class="alert alert-warning">
+        <p>You are about to delete comment '{{ comment.name }}', from '{{ comment.email }}'. This cannot be undone. Are you sure?</p>
+    </div>
+    <form action="/comments/{{ comment.id }}/delete" method="post">
+        <div class="d-flex gap-2">
+            <a href="/comments" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+{% endblock %}

@@ -1,3 +1,6 @@
-<h1>Create comment</h1>
+{% extends "base.html.twig" %}
 
-{{ include('comments/form.html.twig', { comment, action: '/comments/post' }) }}
+{% block content %}
+    <h1>Create comment</h1>
+    {{ include('comments/form.html.twig', { comment, action: '/comments/post' }) }}
+{% endblock %}
