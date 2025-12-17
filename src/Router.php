@@ -51,7 +51,7 @@ class Router
     {
         $this->matchedRouteKey = array_find_key($this->routes, fn($route, $regex) => self::testRequestPathAgainstRegex($requestPath, $regex));
         if(!$this->matchedRouteKey) {
-            throw new HttpNotFoundException($requestPath);
+            throw new HttpNotFoundException("The URL '$requestPath' was not found");
         }
         $this->parameters = self::getRequestParametersForRoutePath($this->routes[$this->matchedRouteKey]['path'], $requestPath);
         return $this;

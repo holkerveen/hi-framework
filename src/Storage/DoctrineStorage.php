@@ -4,6 +4,7 @@ namespace Framework\Storage;
 
 use Doctrine\ORM\EntityManager;
 use Exception;
+use Framework\Exceptions\HttpNotFoundException;
 
 class DoctrineStorage implements EntityStorageInterface
 {
@@ -29,7 +30,11 @@ class DoctrineStorage implements EntityStorageInterface
 
     public function read(string $type, string $id): EntityInterface
     {
-        return $this->em->getRepository($type)->find($id);
+        $entity = $this->em->getRepository($type)->find($id);
+        if($entity === null) {
+            throw new HttpNotFoundException("Could not find entity with id $id");
+        }
+        return $entity;
     }
 
     public function update(EntityInterface $entity): EntityInterface

@@ -6,8 +6,8 @@ use Exception;
 
 class HttpNotFoundException extends Exception
 {
-    public function __construct(private string $path)
+    public function __construct($message)
     {
-        parent::__construct("The URL '{$this->path}' was not found on the server", 404);
+        parent::__construct($message, 404);
     }
 }
