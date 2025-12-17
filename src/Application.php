@@ -1,34 +1,82 @@
-<?php // src/Application.php
+<?php
+// src/Application.php
 
 namespace Framework;
 
 use Closure;
-use Framework\Storage\CsvStorage;
+use Framework\Controllers\ErrorController;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntityStorageInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 use Twig\Environment;
+use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader;
 
-class Application {
-    public function run(): string {
-        $container = new Container();
-        $container->set(LoggerInterface::class, fn() => new FileLogger());
-//        $container->set(EntityStorageInterface::class, fn() => new CsvStorage(dirname(__DIR__).'/csv-files/'));
-        $container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
-        $container->set(Environment::class, function() {
+class Application
+{
+    private Container $container;
+
+    public function __construct()
+    {
+        $this->container = new Container();
+    }
+
+    public function run(): string
+    {
+        try {
+            try {
+                $this->bootstrapContainer();
+                [$closure, $parameters] = $this->getControllerAction();
+                return new Injector($this->container)->call($closure, $parameters);
+            } catch (Throwable $throwable) {
+                return $this->handleHighLevelErrors($throwable);
+            }
+        } catch (Throwable $throwable) {
+            return $this->handleLowLevelErrors($throwable);
+        }
+    }
+
+    private function bootstrapContainer(): void
+    {
+        $this->container->set(LoggerInterface::class, fn() => new FileLogger());
+        $this->container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
+        $this->container->set(Environment::class, function () {
             $loader = new FilesystemLoader(__DIR__ . "/../templates");
-            return new Environment($loader);
+            $twig = new Environment($loader);
+            $twig->addExtension(new IntlExtension());
+            return $twig;
         });
-        
-        $requestPath =  parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        
+    }
+
+    private function getControllerAction(): array
+    {
+        $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
         $router = new Router()->match($requestPath);
         $closure = Closure::fromCallable([
             $router->getControllerInstance(),
             $router->getMethod(),
         ]);
 
-        return new Injector($container)->call($closure, $router->getParameters());
+        return [$closure, $router->getParameters()];
+    }
+
+    private function handleHighLevelErrors(Throwable|\Exception $throwable): string
+    {
+        $this->container->get(LoggerInterface::class)->error($throwable);
+        return new Injector($this->container)->call(
+            new ErrorController()->unknownError(...),
+            ['throwable' => $throwable]
+        );
+    }
+
+    private function handleLowLevelErrors(Throwable|\Exception $throwable): string
+    {
+        error_log(
+            "Uncaught Exception: {$throwable->getMessage()}"
+            . " in {$throwable->getFile()}:{$throwable->getLine()}\n{$throwable->getTraceAsString()}"
+        );
+        return "Uncaught Exception";
     }
 }

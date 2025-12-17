@@ -40,6 +40,12 @@ readonly class Injector
                 continue;
             }
 
+            // Check if explicitly provided in extraParams first
+            if (array_key_exists($parameter->getName(), $extraParams)) {
+                $dependencies[] = $extraParams[$parameter->getName()];
+                continue;
+            }
+
             $dependencies[] = $this->container->get($parameter->getType()->getName());
         }
 

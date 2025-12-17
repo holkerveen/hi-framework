@@ -11,6 +11,8 @@
         "doctrine/orm": "^3.5",
         "doctrine/dbal": "^4.3",
         "symfony/cache": "^7.3",
-        "twig/twig": "^3.22"
+        "twig/twig": "^3.22",
+        "twig/intl-extra": "^3.22",
+        "ext-intl": "*"
     }
 }

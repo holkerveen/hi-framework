@@ -1,0 +1,9 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>500 Server error</h1>
+    <p>An unknown server error has occurred.</p>
+    <p>This error has been logged; please contact support if you have questions or if the error persists. Keep the
+    exact date and time of this occurrence handy when contacting support:</p>
+    <code>{{ "now"|format_datetime('long', 'long') }}</code>
+{% endblock %}
