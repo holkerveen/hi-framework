@@ -4,6 +4,7 @@
 namespace Framework;
 
 use Closure;
+use ErrorException;
 use Framework\Controllers\ErrorController;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntityStorageInterface;
@@ -20,6 +21,7 @@ class Application
     public function __construct()
     {
         $this->container = new Container();
+        $this->setupErrorHandler();
     }
 
     public function run(): string
@@ -78,5 +80,12 @@ class Application
             . " in {$throwable->getFile()}:{$throwable->getLine()}\n{$throwable->getTraceAsString()}"
         );
         return "Uncaught Exception";
+    }
+    
+    private function setupErrorHandler(): void
+    {
+        set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
+            throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+        });
     }
 }
