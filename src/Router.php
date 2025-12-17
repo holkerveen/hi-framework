@@ -4,6 +4,7 @@
 namespace Framework;
 
 use Framework\Attributes\Route;
+use Framework\Exceptions\HttpNotFoundException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -49,6 +50,9 @@ class Router
     public function match(false|array|int|string|null $requestPath): static
     {
         $this->matchedRouteKey = array_find_key($this->routes, fn($route, $regex) => self::testRequestPathAgainstRegex($requestPath, $regex));
+        if(!$this->matchedRouteKey) {
+            throw new HttpNotFoundException($requestPath);
+        }
         $this->parameters = self::getRequestParametersForRoutePath($this->routes[$this->matchedRouteKey]['path'], $requestPath);
         return $this;
     }

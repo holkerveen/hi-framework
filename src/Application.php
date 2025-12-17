@@ -6,6 +6,7 @@ namespace Framework;
 use Closure;
 use ErrorException;
 use Framework\Controllers\ErrorController;
+use Framework\Exceptions\HttpNotFoundException;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntityStorageInterface;
 use Psr\Log\LoggerInterface;
@@ -66,8 +67,17 @@ class Application
 
     private function handleHighLevelErrors(Throwable|\Exception $throwable): string
     {
+        $injector = new Injector($this->container);
+        
+        if($throwable instanceof HttpNotFoundException) {
+            $this->container->get(LoggerInterface::class)->warning($throwable->getMessage());
+            return $injector->call(
+                new ErrorController()->notFoundError(...),
+                ['throwable' => $throwable]
+            );
+        }
         $this->container->get(LoggerInterface::class)->error($throwable);
-        return new Injector($this->container)->call(
+        return $injector->call(
             new ErrorController()->unknownError(...),
             ['throwable' => $throwable]
         );
