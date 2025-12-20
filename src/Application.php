@@ -6,9 +6,11 @@ namespace Framework;
 use Closure;
 use ErrorException;
 use Framework\Controllers\ErrorController;
-use Framework\Exceptions\HttpNotFoundException;
+use Framework\Http\ErrorResponse;
+use Framework\Http\Response;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntityStorageInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Twig\Environment;
@@ -25,13 +27,14 @@ class Application
         $this->setupErrorHandler();
     }
 
-    public function run(): string
+    public function run(): ResponseInterface
     {
         try {
             try {
                 $this->bootstrapContainer();
                 [$closure, $parameters] = $this->getControllerAction();
-                return new Injector($this->container)->call($closure, $parameters);
+                $response = new Injector($this->container)->call($closure, $parameters);
+                return $response instanceof Response ? $response: new Response($response);
             } catch (Throwable $throwable) {
                 return $this->handleHighLevelErrors($throwable);
             }
@@ -65,31 +68,23 @@ class Application
         return [$closure, $router->getParameters()];
     }
 
-    private function handleHighLevelErrors(Throwable|\Exception $throwable): string
+    private function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         $injector = new Injector($this->container);
-        
-        if($throwable instanceof HttpNotFoundException) {
-            $this->container->get(LoggerInterface::class)->warning($throwable->getMessage());
-            return $injector->call(
-                new ErrorController()->notFoundError(...),
-                ['throwable' => $throwable]
-            );
-        }
-        $this->container->get(LoggerInterface::class)->error($throwable);
+        $this->container->get(LoggerInterface::class)->error($throwable->getMessage());
         return $injector->call(
-            new ErrorController()->unknownError(...),
+            new ErrorController()->error(...),
             ['throwable' => $throwable]
         );
     }
 
-    private function handleLowLevelErrors(Throwable|\Exception $throwable): string
+    private function handleLowLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         error_log(
             "Uncaught Exception: {$throwable->getMessage()}"
             . " in {$throwable->getFile()}:{$throwable->getLine()}\n{$throwable->getTraceAsString()}"
         );
-        return "Uncaught Exception";
+        return new ErrorResponse("Uncaught exception");
     }
     
     private function setupErrorHandler(): void
