@@ -1,0 +1,6 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Create user</h1>
+    {{ include('users/form.html.twig', { user, action: '/users/post' }) }}
+{% endblock %}

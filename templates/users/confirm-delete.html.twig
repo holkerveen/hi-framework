@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <h1>Delete User</h1>
+    <div class="alert alert-warning">
+        <p>You are about to delete the user with email address '{{ user.email }}'. This cannot be undone. Are you sure?</p>
+    </div>
+    <form action="/users/{{ user.id }}/delete" method="post">
+        <div class="d-flex gap-2">
+            <a href="/users" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+{% endblock %}
