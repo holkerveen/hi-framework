@@ -5,8 +5,11 @@ namespace Framework;
 
 use Closure;
 use ErrorException;
+use Framework\Attributes\AllowAccess;
 use Framework\Controllers\ErrorController;
+use Framework\Enums\Role;
 use Framework\Exceptions\HttpNotFoundException;
+use Framework\Exceptions\HttpUnauthenticatedException;
 use Framework\Http\ErrorResponse;
 use Framework\Http\Response;
 use Framework\Storage\DoctrineStorage;
@@ -14,6 +17,7 @@ use Framework\Storage\EntitySearchInterface;
 use Framework\Storage\EntityStorageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionMethod;
 use Throwable;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
@@ -35,8 +39,15 @@ class Application
             try {
                 session_start();
                 $this->bootstrapContainer();
-                [$closure, $parameters] = $this->getControllerAction();
-                $response = new Injector($this->container)->call($closure, $parameters);
+                $router = (new Router())->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+                $this->checkAccess($router->getControllerInstance(), $router->getMethod());
+
+                $closure = Closure::fromCallable([
+                    $router->getControllerInstance(),
+                    $router->getMethod(),
+                ]);
+
+                $response = new Injector($this->container)->call($closure, $router->getParameters());
                 return $response instanceof Response ? $response: new Response($response);
             } catch (Throwable $throwable) {
                 return $this->handleHighLevelErrors($throwable);
@@ -62,24 +73,28 @@ class Application
         });
     }
 
-    private function getControllerAction(): array
+    private function checkAccess(object $controller, string $methodName): void
     {
-        $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $reflection = new ReflectionMethod($controller, $methodName);
+        $attributes = $reflection->getAttributes(AllowAccess::class);
 
-        $router = new Router()->match($requestPath);
-        $closure = Closure::fromCallable([
-            $router->getControllerInstance(),
-            $router->getMethod(),
-        ]);
+        if (empty($attributes)) {
+            throw new HttpUnauthenticatedException();
+        }
 
-        return [$closure, $router->getParameters()];
+        $allowAccess = $attributes[0]->newInstance();
+        $isAuthenticated = !empty($_SESSION['user']);
+
+        if ($allowAccess->role === Role::Authenticated && !$isAuthenticated) {
+            throw new HttpUnauthenticatedException();
+        }
     }
 
     private function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         $injector = new Injector($this->container);
         // Properly handled errors do not need detailed logging
-        if($throwable instanceof HttpNotFoundException) {
+        if($throwable instanceof HttpNotFoundException || $throwable instanceof HttpUnauthenticatedException) {
             $this->container->get(LoggerInterface::class)->error($throwable->getMessage());
         }
         else {

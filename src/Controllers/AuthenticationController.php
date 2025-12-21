@@ -2,8 +2,10 @@
 
 namespace Framework\Controllers;
 
+use Framework\Attributes\AllowAccess;
 use Framework\Attributes\Route;
 use Framework\Entity\User;
+use Framework\Enums\Role;
 use Framework\Http\RedirectResponse;
 use Framework\Http\Response;
 use Framework\Http\ValidationErrorResponse;
@@ -13,6 +15,7 @@ use Twig\Environment;
 class AuthenticationController
 {
     #[Route('/login')]
+    #[AllowAccess(Role::Unauthenticated)]
     public function login(Environment $twig, EntitySearchInterface $store): Response
     {
         if (isset($_POST['email']) && isset($_POST['password'])) {
@@ -28,6 +31,7 @@ class AuthenticationController
     }
 
     #[Route('/logout')]
+    #[AllowAccess(Role::Unauthenticated)]
     public function logout(Environment $twig): Response
     {
         session_destroy();

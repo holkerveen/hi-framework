@@ -3,14 +3,17 @@
 
 namespace Framework\Controllers;
 
+use Framework\Attributes\AllowAccess;
 use Framework\Attributes\Route;
 use Framework\Entity\User;
+use Framework\Enums\Role;
 use Framework\Storage\EntityStorageInterface;
 use Twig\Environment;
 
 class UserController
 {
     #[Route('/users')]
+    #[AllowAccess(Role::Authenticated)]
     public function index(EntityStorageInterface $store, Environment $twig): string
     {
         return $twig->render("users/index.html.twig", [
@@ -19,12 +22,14 @@ class UserController
     }
 
     #[Route('/users/create')]
+    #[AllowAccess(Role::Authenticated)]
     public function create(Environment $twig): string
     {
         return $twig->render("users/create.html.twig");
     }
 
     #[Route('/users/post')]
+    #[AllowAccess(Role::Authenticated)]
     public function post(EntityStorageInterface $store, Environment $twig): string
     {
         $user = new User();
@@ -36,6 +41,7 @@ class UserController
     }
 
     #[Route('/users/{id}/confirm-delete')]
+    #[AllowAccess(Role::Authenticated)]
     public function confirmDelete(string $id, EntityStorageInterface $store, Environment $twig): string
     {
         $user = $store->read(User::class, $id);
@@ -43,6 +49,7 @@ class UserController
     }
     
     #[Route('/users/{id}/delete')]
+    #[AllowAccess(Role::Authenticated)]
     public function delete(string $id, EntityStorageInterface $store, Environment $twig): string
     {
         $user = $store->read(User::class, $id);
@@ -51,6 +58,7 @@ class UserController
     }
     
     #[Route('/users/{id}/edit')]
+    #[AllowAccess(Role::Authenticated)]
     public function edit(string $id, EntityStorageInterface $store, Environment $twig): string
     {
         return $twig->render("users/edit.html.twig", [
@@ -59,6 +67,7 @@ class UserController
     }
     
     #[Route('/users/{id}/put')]
+    #[AllowAccess(Role::Authenticated)]
     public function put(string $id, EntityStorageInterface $store, Environment $twig): string
     {
         $user = $store->read(User::class, $id);
