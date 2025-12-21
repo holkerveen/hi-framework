@@ -1,0 +1,10 @@
+<?php
+
+namespace Framework\Http;
+
+class ValidationErrorResponse extends Response
+{
+    public function __construct(string $message) {
+        parent::__construct($message, 422);
+    }
+}

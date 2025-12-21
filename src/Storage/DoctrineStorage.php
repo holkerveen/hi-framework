@@ -3,10 +3,9 @@
 namespace Framework\Storage;
 
 use Doctrine\ORM\EntityManager;
-use Exception;
 use Framework\Exceptions\HttpNotFoundException;
 
-class DoctrineStorage implements EntityStorageInterface
+class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
 {
     
     private EntityManager $em;
@@ -48,5 +47,10 @@ class DoctrineStorage implements EntityStorageInterface
     {
         $this->em->remove($entity);
         $this->em->flush();
+    }
+
+    public function find(string $type, array $conditions): array
+    {
+        return $this->em->getRepository($type)->findBy($conditions);
     }
 }

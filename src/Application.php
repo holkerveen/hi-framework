@@ -6,9 +6,11 @@ namespace Framework;
 use Closure;
 use ErrorException;
 use Framework\Controllers\ErrorController;
+use Framework\Exceptions\HttpNotFoundException;
 use Framework\Http\ErrorResponse;
 use Framework\Http\Response;
 use Framework\Storage\DoctrineStorage;
+use Framework\Storage\EntitySearchInterface;
 use Framework\Storage\EntityStorageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -31,6 +33,7 @@ class Application
     {
         try {
             try {
+                session_start();
                 $this->bootstrapContainer();
                 [$closure, $parameters] = $this->getControllerAction();
                 $response = new Injector($this->container)->call($closure, $parameters);
@@ -47,6 +50,7 @@ class Application
     {
         $this->container->set(LoggerInterface::class, fn() => new FileLogger());
         $this->container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
+        $this->container->set(EntitySearchInterface::class, fn() => new DoctrineStorage);
         $this->container->set(Environment::class, function () {
             $loader = new FilesystemLoader(__DIR__ . "/../templates");
             $twig = new Environment($loader);
@@ -71,7 +75,13 @@ class Application
     private function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         $injector = new Injector($this->container);
-        $this->container->get(LoggerInterface::class)->error($throwable->getMessage());
+        // Properly handled errors do not need detailed logging
+        if($throwable instanceof HttpNotFoundException) {
+            $this->container->get(LoggerInterface::class)->error($throwable->getMessage());
+        }
+        else {
+            $this->container->get(LoggerInterface::class)->error($throwable);
+        }
         return $injector->call(
             new ErrorController()->error(...),
             ['throwable' => $throwable]
