@@ -26,4 +26,11 @@ class AuthenticationController
         }
         return new Response($twig->render("users/login.html.twig"));
     }
+
+    #[Route('/logout')]
+    public function logout(Environment $twig): Response
+    {
+        session_destroy();
+        return new Response($twig->render("users/logout.html.twig"));
+    }
 }

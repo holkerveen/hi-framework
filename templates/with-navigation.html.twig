@@ -21,6 +21,16 @@
                         <a class="nav-link" href="/users">Users</a>
                     </li>
                 </ul>
+                <div class="d-flex align-items-center">
+                    {% if app.session.user is defined %}
+                        <span class="navbar-text me-3">
+                            {{ app.session.user.email }}
+                        </span>
+                        <a href="/logout" class="btn btn-outline-secondary btn-sm">Logout</a>
+                    {% else %}
+                        <a href="/login" class="btn btn-primary btn-sm">Login</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>

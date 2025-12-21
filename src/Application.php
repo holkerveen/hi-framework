@@ -55,6 +55,9 @@ class Application
             $loader = new FilesystemLoader(__DIR__ . "/../templates");
             $twig = new Environment($loader);
             $twig->addExtension(new IntlExtension());
+            $twig->addGlobal('app', [
+                'session' => $_SESSION
+            ]);
             return $twig;
         });
     }
