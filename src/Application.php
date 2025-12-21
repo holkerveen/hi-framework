@@ -5,19 +5,18 @@ namespace Framework;
 
 use Closure;
 use ErrorException;
-use Framework\Attributes\AllowAccess;
 use Framework\Controllers\ErrorController;
-use Framework\Enums\Role;
 use Framework\Exceptions\HttpNotFoundException;
 use Framework\Exceptions\HttpUnauthenticatedException;
 use Framework\Http\ErrorResponse;
 use Framework\Http\Response;
+use Framework\Security\AccessControl;
 use Framework\Storage\DoctrineStorage;
 use Framework\Storage\EntitySearchInterface;
 use Framework\Storage\EntityStorageInterface;
+use Framework\Twig\AccessControlExtension;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionMethod;
 use Throwable;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
@@ -66,6 +65,7 @@ class Application
             $loader = new FilesystemLoader(__DIR__ . "/../templates");
             $twig = new Environment($loader);
             $twig->addExtension(new IntlExtension());
+            $twig->addExtension(new AccessControlExtension());
             $twig->addGlobal('app', [
                 'session' => $_SESSION
             ]);
@@ -75,17 +75,8 @@ class Application
 
     private function checkAccess(object $controller, string $methodName): void
     {
-        $reflection = new ReflectionMethod($controller, $methodName);
-        $attributes = $reflection->getAttributes(AllowAccess::class);
-
-        if (empty($attributes)) {
-            throw new HttpUnauthenticatedException();
-        }
-
-        $allowAccess = $attributes[0]->newInstance();
-        $isAuthenticated = !empty($_SESSION['user']);
-
-        if ($allowAccess->role === Role::Authenticated && !$isAuthenticated) {
+        $accessControl = new AccessControl();
+        if (!$accessControl->isAllowed($controller, $methodName)) {
             throw new HttpUnauthenticatedException();
         }
     }
