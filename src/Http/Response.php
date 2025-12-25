@@ -8,21 +8,9 @@ use Psr\Http\Message\StreamInterface;
 
 class Response implements ResponseInterface
 {
-    public int $statusCode {
-        get {
-            return $this->statusCode;
-        }
-    }
-    public string $reasonPhrase {
-        get {
-            return $this->reasonPhrase;
-        }
-    }
-    public array $headers {
-        get {
-            return $this->headers;
-        }
-    }
+    public int $statusCode;
+    public string $reasonPhrase;
+    public array $headers;
     private StreamInterface $body;
     private string $protocolVersion;
 
@@ -142,5 +130,20 @@ class Response implements ResponseInterface
             $normalized[strtolower($name)] = is_array($value) ? $value : [$value];
         }
         return $normalized;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    public function getReasonPhrase(): string
+    {
+        return $this->reasonPhrase;
     }
 }
