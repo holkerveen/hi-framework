@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework;
+namespace Hi;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

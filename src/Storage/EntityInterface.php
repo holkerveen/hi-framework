@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Storage;
+namespace Hi\Storage;
 
 interface EntityInterface {
     public function setId(string $id);

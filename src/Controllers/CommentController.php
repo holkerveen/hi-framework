@@ -1,13 +1,13 @@
 <?php
 // src/Controllers/CommentController.php
 
-namespace Framework\Controllers;
+namespace Hi\Controllers;
 
-use Framework\Attributes\AllowAccess;
-use Framework\Attributes\Route;
-use Framework\Entity\Comment;
-use Framework\Enums\Role;
-use Framework\Storage\EntityStorageInterface;
+use Hi\Attributes\AllowAccess;
+use Hi\Attributes\Route;
+use Hi\Entity\Comment;
+use Hi\Enums\Role;
+use Hi\Storage\EntityStorageInterface;
 use Twig\Environment;
 
 class CommentController

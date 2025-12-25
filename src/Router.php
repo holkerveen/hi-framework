@@ -1,10 +1,10 @@
 <?php
 // src/Router.php
 
-namespace Framework;
+namespace Hi;
 
-use Framework\Attributes\Route;
-use Framework\Exceptions\HttpNotFoundException;
+use Hi\Attributes\Route;
+use Hi\Exceptions\HttpNotFoundException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -19,7 +19,7 @@ class Router
         $controllerFiles = glob(__DIR__ . '/Controllers/*.php');
 
         foreach ($controllerFiles as $file) {
-            $className = 'Framework\\Controllers\\' . basename($file, '.php');
+            $className = 'Hi\\Controllers\\' . basename($file, '.php');
 
             foreach (new ReflectionClass($className)->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
                 $attributes = $method->getAttributes(Route::class);

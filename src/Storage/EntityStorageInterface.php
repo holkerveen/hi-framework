@@ -1,6 +1,6 @@
 <?php // src/EntityStorageInterface.php
 
-namespace Framework\Storage;
+namespace Hi\Storage;
 
 interface EntityStorageInterface
 {

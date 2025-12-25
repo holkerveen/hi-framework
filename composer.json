@@ -1,19 +1,30 @@
 {
-    "name": "holkerveen/diy-php-framework",
-    "autoload": {
-        "psr-4": {
-            "Framework\\": "src/"
-        }
-    },
+    "name": "holkerveen/hi-framework",
+    "description": "A lightweight PHP framework with routing, dependency injection, Doctrine ORM, Twig templating, and PSR-7 HTTP support",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
     "require": {
+        "php": ">=8.4",
         "psr/log": "^3.0",
         "psr/container": "^2.0",
+        "psr/http-message": "^2.0",
         "doctrine/orm": "^3.5",
         "doctrine/dbal": "^4.3",
         "symfony/cache": "^7.3",
         "twig/twig": "^3.22",
         "twig/intl-extra": "^3.22",
-        "ext-intl": "*",
-        "psr/http-message": "^2.0"
+        "ext-intl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hi\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/framework"
+    ],
+    "scripts": {
+        "framework:install": "bin/framework install",
+        "framework:serve": "bin/framework serve"
     }
 }

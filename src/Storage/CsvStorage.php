@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Storage;
+namespace Hi\Storage;
 
 use Exception;
 use ReflectionClass;

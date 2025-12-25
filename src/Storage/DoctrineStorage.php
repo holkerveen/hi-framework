@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Storage;
+namespace Hi\Storage;
 
 use Doctrine\ORM\EntityManager;
-use Framework\Exceptions\HttpNotFoundException;
+use Hi\Exceptions\HttpNotFoundException;
 
 class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
 {

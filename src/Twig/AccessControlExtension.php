@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Twig;
+namespace Hi\Twig;
 
-use Framework\Router;
-use Framework\Security\AccessControl;
+use Hi\Router;
+use Hi\Security\AccessControl;
 use Throwable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

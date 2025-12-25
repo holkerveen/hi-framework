@@ -1,13 +1,13 @@
 <?php
 // src/Controllers/UserController.php
 
-namespace Framework\Controllers;
+namespace Hi\Controllers;
 
-use Framework\Attributes\AllowAccess;
-use Framework\Attributes\Route;
-use Framework\Entity\User;
-use Framework\Enums\Role;
-use Framework\Storage\EntityStorageInterface;
+use Hi\Attributes\AllowAccess;
+use Hi\Attributes\Route;
+use Hi\Entity\User;
+use Hi\Enums\Role;
+use Hi\Storage\EntityStorageInterface;
 use Twig\Environment;
 
 class UserController

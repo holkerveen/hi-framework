@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Entity;
+namespace Hi\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Framework\Storage\EntityInterface;
+use Hi\Storage\EntityInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'comments')]

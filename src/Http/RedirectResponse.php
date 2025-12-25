@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Http;
+namespace Hi\Http;
 
 class RedirectResponse extends Response
 {

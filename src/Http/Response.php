@@ -1,7 +1,7 @@
 <?php
 // src/Http/Response.php
 
-namespace Framework\Http;
+namespace Hi\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;

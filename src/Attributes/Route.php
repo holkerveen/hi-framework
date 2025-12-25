@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Attributes;
+namespace Hi\Attributes;
 
 use Attribute;
 

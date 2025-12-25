@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ title }}</h2>
+    <p>Your framework is successfully installed and running!</p>
+
+    <h3 style="margin-top: 2rem;">What's included:</h3>
+    <ul style="margin-left: 2rem; margin-top: 1rem;">
+        <li>Attribute-based routing</li>
+        <li>Dependency injection</li>
+        <li>Access control system</li>
+        <li>Doctrine ORM integration</li>
+        <li>Twig templating</li>
+        <li>PSR-7 HTTP support</li>
+    </ul>
+
+    <h3 style="margin-top: 2rem;">Next steps:</h3>
+    <ol style="margin-left: 2rem; margin-top: 1rem;">
+        <li>Create more controllers in <code>src/Controllers/</code></li>
+        <li>Define your entities in <code>src/Entity/</code></li>
+        <li>Create templates in <code>templates/</code></li>
+        <li>Configure your database in <code>src/config/doctrine-bootstrap.php</code></li>
+    </ol>
+
+    <p style="margin-top: 2rem;">
+        <strong>Documentation:</strong>
+        <a href="https://github.com/holkerveen/hi-framework" target="_blank">View on GitHub</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Attributes;
+namespace Hi\Attributes;
 
 use Attribute;
-use Framework\Enums\Role;
+use Hi\Enums\Role;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 readonly class AllowAccess

@@ -1,10 +1,10 @@
 <?php
 
-namespace Framework\Controllers;
+namespace Hi\Controllers;
 
-use Framework\Exceptions\HttpNotFoundException;
-use Framework\Exceptions\HttpUnauthenticatedException;
-use Framework\Http\ErrorResponse;
+use Hi\Exceptions\HttpNotFoundException;
+use Hi\Exceptions\HttpUnauthenticatedException;
+use Hi\Http\ErrorResponse;
 use Throwable;
 use Twig\Environment;
 

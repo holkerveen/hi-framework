@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Enums;
+namespace Hi\Enums;
 
 enum Role
 {

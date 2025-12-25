@@ -1,7 +1,7 @@
 <?php
 // src/Injector.php
 
-namespace Framework;
+namespace Hi;
 
 use Closure;
 use Psr\Container\ContainerInterface;

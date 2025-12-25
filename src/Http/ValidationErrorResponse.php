@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Http;
+namespace Hi\Http;
 
 class ValidationErrorResponse extends Response
 {

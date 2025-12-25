@@ -1,20 +1,20 @@
 <?php
 // src/Application.php
 
-namespace Framework;
+namespace Hi;
 
 use Closure;
 use ErrorException;
-use Framework\Controllers\ErrorController;
-use Framework\Exceptions\HttpNotFoundException;
-use Framework\Exceptions\HttpUnauthenticatedException;
-use Framework\Http\ErrorResponse;
-use Framework\Http\Response;
-use Framework\Security\AccessControl;
-use Framework\Storage\DoctrineStorage;
-use Framework\Storage\EntitySearchInterface;
-use Framework\Storage\EntityStorageInterface;
-use Framework\Twig\AccessControlExtension;
+use Hi\Controllers\ErrorController;
+use Hi\Exceptions\HttpNotFoundException;
+use Hi\Exceptions\HttpUnauthenticatedException;
+use Hi\Http\ErrorResponse;
+use Hi\Http\Response;
+use Hi\Security\AccessControl;
+use Hi\Storage\DoctrineStorage;
+use Hi\Storage\EntitySearchInterface;
+use Hi\Storage\EntityStorageInterface;
+use Hi\Twig\AccessControlExtension;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;

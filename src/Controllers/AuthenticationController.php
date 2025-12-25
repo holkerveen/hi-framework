@@ -1,15 +1,15 @@
 <?php
 
-namespace Framework\Controllers;
+namespace Hi\Controllers;
 
-use Framework\Attributes\AllowAccess;
-use Framework\Attributes\Route;
-use Framework\Entity\User;
-use Framework\Enums\Role;
-use Framework\Http\RedirectResponse;
-use Framework\Http\Response;
-use Framework\Http\ValidationErrorResponse;
-use Framework\Storage\EntitySearchInterface;
+use Hi\Attributes\AllowAccess;
+use Hi\Attributes\Route;
+use Hi\Entity\User;
+use Hi\Enums\Role;
+use Hi\Http\RedirectResponse;
+use Hi\Http\Response;
+use Hi\Http\ValidationErrorResponse;
+use Hi\Storage\EntitySearchInterface;
 use Twig\Environment;
 
 class AuthenticationController

@@ -1,7 +1,7 @@
 <?php
 // src/Http/Stream.php
 
-namespace Framework\Http;
+namespace Hi\Http;
 
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;

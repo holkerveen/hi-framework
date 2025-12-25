@@ -1,6 +1,6 @@
 <?php // src/Http/ResponseEmitter.php
 
-namespace Framework\Http;
+namespace Hi\Http;
 
 use Psr\Http\Message\ResponseInterface;
 

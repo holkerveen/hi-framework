@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Security;
+namespace Hi\Security;
 
-use Framework\Attributes\AllowAccess;
-use Framework\Enums\Role;
+use Hi\Attributes\AllowAccess;
+use Hi\Enums\Role;
 use ReflectionMethod;
 
 class AccessControl
