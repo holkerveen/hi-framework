@@ -19,12 +19,5 @@
         "psr-4": {
             "Hi\\": "src/"
         }
-    },
-    "bin": [
-        "bin/framework"
-    ],
-    "scripts": {
-        "framework:install": "bin/framework install",
-        "framework:serve": "bin/framework serve"
     }
 }

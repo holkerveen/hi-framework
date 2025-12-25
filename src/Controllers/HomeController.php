@@ -13,7 +13,7 @@ class HomeController
     #[AllowAccess(Role::Unauthenticated)]
     public function index(Environment $twig): string
     {
-        return $twig->render('home.html.twig', [
+        return $twig->render('dashboard.html.twig', [
             'title' => 'Welcome to Hi Framework',
         ]);
     }

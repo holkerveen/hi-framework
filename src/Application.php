@@ -28,7 +28,7 @@ class Application
 
     public function __construct()
     {
-        $this->container = new Container();
+        $this->container = new \Hi\Container();
         $this->setupErrorHandler();
     }
 
@@ -36,9 +36,9 @@ class Application
     {
         try {
             try {
-                session_start();
+                $this->startSession();
                 $this->bootstrapContainer();
-                $router = (new Router())->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+                $router = new Router()->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $this->checkAccess($router->getControllerInstance(), $router->getMethod());
 
                 $closure = Closure::fromCallable([
@@ -56,24 +56,39 @@ class Application
         }
     }
 
-    private function bootstrapContainer(): void
+    protected function startSession(): void
+    {
+        session_start();
+    }
+
+    protected function bootstrapContainer(): void
     {
         $this->container->set(LoggerInterface::class, fn() => new FileLogger());
         $this->container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
         $this->container->set(EntitySearchInterface::class, fn() => new DoctrineStorage);
         $this->container->set(Environment::class, function () {
-            $loader = new FilesystemLoader(__DIR__ . "/../templates");
+            $loader = new FilesystemLoader($this->getTemplatePath());
             $twig = new Environment($loader);
-            $twig->addExtension(new IntlExtension());
-            $twig->addExtension(new AccessControlExtension());
-            $twig->addGlobal('app', [
-                'session' => $_SESSION
-            ]);
+            $this->configureTwig($twig);
             return $twig;
         });
     }
 
-    private function checkAccess(object $controller, string $methodName): void
+    protected function getTemplatePath(): string
+    {
+        return dirname(__DIR__) . "/templates";
+    }
+
+    protected function configureTwig(Environment $twig): void
+    {
+        $twig->addExtension(new IntlExtension());
+        $twig->addExtension(new AccessControlExtension());
+        $twig->addGlobal('app', [
+            'session' => $_SESSION
+        ]);
+    }
+
+    protected function checkAccess(object $controller, string $methodName): void
     {
         $accessControl = new AccessControl();
         if (!$accessControl->isAllowed($controller, $methodName)) {
@@ -81,7 +96,7 @@ class Application
         }
     }
 
-    private function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
+    protected function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         $injector = new Injector($this->container);
         // Properly handled errors do not need detailed logging
@@ -92,12 +107,12 @@ class Application
             $this->container->get(LoggerInterface::class)->error($throwable);
         }
         return $injector->call(
-            new ErrorController()->error(...),
+            $this->getErrorController()->error(...),
             ['throwable' => $throwable]
         );
     }
 
-    private function handleLowLevelErrors(Throwable|\Exception $throwable): ResponseInterface
+    protected function handleLowLevelErrors(Throwable|\Exception $throwable): ResponseInterface
     {
         error_log(
             "Uncaught Exception: {$throwable->getMessage()}"
@@ -105,8 +120,16 @@ class Application
         );
         return new ErrorResponse("Uncaught exception");
     }
-    
-    private function setupErrorHandler(): void
+
+    protected function getErrorController(): ErrorController
+    {
+        return new ErrorController();
+    }
+
+    /**
+     * Setup PHP error handler - override to customize error handling
+     */
+    protected function setupErrorHandler(): void
     {
         set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
