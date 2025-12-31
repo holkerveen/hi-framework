@@ -4,12 +4,17 @@ namespace Hi\Twig;
 
 use Hi\Router;
 use Hi\Security\AccessControl;
+use Hi\SessionInterface;
 use Throwable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AccessControlExtension extends AbstractExtension
 {
+    public function __construct(private SessionInterface $session)
+    {
+    }
+
     public function getFunctions(): array
     {
         return [
@@ -21,7 +26,7 @@ class AccessControlExtension extends AbstractExtension
     {
         try {
             $router = new Router()->match($path);
-            $accessControl = new AccessControl();
+            $accessControl = new AccessControl($this->session);
             return $accessControl->isAllowed(
                 $router->getControllerInstance(),
                 $router->getMethod()

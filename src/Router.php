@@ -16,8 +16,11 @@ class Router
 
     public function __construct()
     {
-        $controllerFiles = glob(__DIR__ . '/Controllers/*.php');
-
+        $controllerFiles = array_unique(array_merge(
+            glob(PathHelper::getBasedir() . '/src/Controllers/*.php'),
+            glob(__DIR__ . '/Controllers/*.php'),
+        ));
+        
         foreach ($controllerFiles as $file) {
             $className = 'Hi\\Controllers\\' . basename($file, '.php');
 

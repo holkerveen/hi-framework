@@ -15,6 +15,7 @@ use Hi\Storage\DoctrineStorage;
 use Hi\Storage\EntitySearchInterface;
 use Hi\Storage\EntityStorageInterface;
 use Hi\Twig\AccessControlExtension;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -30,14 +31,17 @@ class Application
     {
         $this->container = new \Hi\Container();
         $this->setupErrorHandler();
+        $this->bootstrap();
+    }
+    
+    public function getContainer(): ContainerInterface {
+        return $this->container;
     }
 
     public function run(): ResponseInterface
     {
         try {
             try {
-                $this->startSession();
-                $this->bootstrapContainer();
                 $router = new Router()->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $this->checkAccess($router->getControllerInstance(), $router->getMethod());
 
@@ -56,20 +60,17 @@ class Application
         }
     }
 
-    protected function startSession(): void
+    protected function bootstrap(): void
     {
-        session_start();
-    }
-
-    protected function bootstrapContainer(): void
-    {
+        $this->container->set(SessionInterface::class, fn() => new Session());
         $this->container->set(LoggerInterface::class, fn() => new FileLogger());
         $this->container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
         $this->container->set(EntitySearchInterface::class, fn() => new DoctrineStorage);
         $this->container->set(Environment::class, function () {
             $loader = new FilesystemLoader($this->getTemplatePath());
             $twig = new Environment($loader);
-            $this->configureTwig($twig);
+            $session = $this->container->get(SessionInterface::class);
+            $this->configureTwig($twig, $session);
             return $twig;
         });
     }
@@ -79,18 +80,19 @@ class Application
         return dirname(__DIR__) . "/templates";
     }
 
-    protected function configureTwig(Environment $twig): void
+    protected function configureTwig(Environment $twig, SessionInterface $session): void
     {
         $twig->addExtension(new IntlExtension());
-        $twig->addExtension(new AccessControlExtension());
+        $twig->addExtension(new AccessControlExtension($session));
         $twig->addGlobal('app', [
-            'session' => $_SESSION
+            'session' => $session
         ]);
     }
 
     protected function checkAccess(object $controller, string $methodName): void
     {
-        $accessControl = new AccessControl();
+        $session = $this->container->get(SessionInterface::class);
+        $accessControl = new AccessControl($session);
         if (!$accessControl->isAllowed($controller, $methodName)) {
             throw new HttpUnauthenticatedException();
         }

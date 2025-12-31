@@ -4,10 +4,15 @@ namespace Hi\Security;
 
 use Hi\Attributes\AllowAccess;
 use Hi\Enums\Role;
+use Hi\SessionInterface;
 use ReflectionMethod;
 
 class AccessControl
 {
+    public function __construct(private SessionInterface $session)
+    {
+    }
+
     public function isAllowed(object $controller, string $methodName): bool
     {
         $reflection = new ReflectionMethod($controller, $methodName);
@@ -19,7 +24,7 @@ class AccessControl
         }
 
         $allowAccess = $attributes[0]->newInstance();
-        $isAuthenticated = !empty($_SESSION['user']);
+        $isAuthenticated = $this->session->has('user');
 
         // Check if the required role matches the user's authentication status
         if ($allowAccess->role === Role::Authenticated && !$isAuthenticated) {

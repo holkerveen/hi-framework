@@ -2,16 +2,30 @@
 
 namespace Hi\Storage;
 
+use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMSetup;
 use Hi\Exceptions\HttpNotFoundException;
+use Hi\PathHelper;
 
 class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
 {
-    
     private EntityManager $em;
-    
-    public function __construct() {
-        $this->em = require(__DIR__.'/../../doctrine-bootstrap.php');
+
+    public function __construct()
+    {
+        $config = ORMSetup::createAttributeMetadataConfig(paths: [
+            getcwd() . "/src/Entity",
+            getcwd() . "/vendor/holkerveen/hi-framework/src/Entity",
+        ]);
+        $config->enableNativeLazyObjects(true);
+
+        $connection = DriverManager::getConnection([
+            'driver' => 'pdo_sqlite',
+            'path' => PathHelper::getBasedir() . '/db.sqlite',
+        ], $config);
+
+        $this->em = new EntityManager($connection, $config);
     }
 
     public function index(string $type): array
@@ -30,7 +44,7 @@ class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
     public function read(string $type, string $id): EntityInterface
     {
         $entity = $this->em->getRepository($type)->find($id);
-        if($entity === null) {
+        if ($entity === null) {
             throw new HttpNotFoundException("Could not find entity with id $id");
         }
         return $entity;
@@ -52,5 +66,10 @@ class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
     public function find(string $type, array $conditions): array
     {
         return $this->em->getRepository($type)->findBy($conditions);
+    }
+
+    public function getEntityManager(): EntityManager
+    {
+        return $this->em;
     }
 }
