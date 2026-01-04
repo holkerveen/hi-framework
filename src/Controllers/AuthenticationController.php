@@ -12,13 +12,13 @@ use Hi\Http\ValidationErrorResponse;
 use Hi\SessionInterface;
 use Hi\SessionUser;
 use Hi\Storage\EntitySearchInterface;
-use Twig\Environment;
+use Hi\ViewInterface;
 
 class AuthenticationController
 {
     #[Route('/login')]
     #[AllowAccess(Role::Unauthenticated)]
-    public function login(Environment $twig, EntitySearchInterface $store, SessionInterface $session): Response
+    public function login(ViewInterface $view, EntitySearchInterface $store, SessionInterface $session): Response
     {
         if (isset($_POST['email']) && isset($_POST['password'])) {
             /** @var ?User $user */
@@ -29,14 +29,14 @@ class AuthenticationController
             $session->set('user', SessionUser::fromUser($user));
             return new RedirectResponse('/');
         }
-        return new Response($twig->render("users/login.html.twig"));
+        return new Response($view->render("users/login.html.twig"));
     }
 
     #[Route('/logout')]
     #[AllowAccess(Role::Unauthenticated)]
-    public function logout(Environment $twig, SessionInterface $session): Response
+    public function logout(ViewInterface $view, SessionInterface $session): Response
     {
         $session->clear();
-        return new Response($twig->render("users/logout.html.twig"));
+        return new Response($view->render("users/logout.html.twig"));
     }
 }

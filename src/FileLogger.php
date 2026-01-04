@@ -2,9 +2,11 @@
 
 namespace Hi;
 
+use Hi\Attributes\Service;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
+#[Service]
 class FileLogger implements LoggerInterface
 {
     private ?string $logFile;

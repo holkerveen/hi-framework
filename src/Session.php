@@ -3,6 +3,9 @@
 
 namespace Hi;
 
+use Hi\Attributes\Service;
+
+#[Service]
 class Session implements SessionInterface
 {
     public function __construct()

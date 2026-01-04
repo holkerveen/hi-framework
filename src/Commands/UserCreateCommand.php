@@ -4,7 +4,6 @@ namespace Hi\Commands;
 
 use Exception;
 use Hi\Entity\User;
-use Hi\Storage\DoctrineStorage;
 use Hi\Storage\EntityStorageInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;

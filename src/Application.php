@@ -11,17 +11,10 @@ use Hi\Exceptions\HttpUnauthenticatedException;
 use Hi\Http\ErrorResponse;
 use Hi\Http\Response;
 use Hi\Security\AccessControl;
-use Hi\Storage\DoctrineStorage;
-use Hi\Storage\EntitySearchInterface;
-use Hi\Storage\EntityStorageInterface;
-use Hi\Twig\AccessControlExtension;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
-use Twig\Environment;
-use Twig\Extra\Intl\IntlExtension;
-use Twig\Loader\FilesystemLoader;
 
 class Application
 {
@@ -29,9 +22,9 @@ class Application
 
     public function __construct()
     {
-        $this->container = new \Hi\Container();
         $this->setupErrorHandler();
-        $this->bootstrap();
+        $this->container = new \Hi\Container();
+        $this->container->scan($this->getServiceProviderDirectories());
     }
     
     public function getContainer(): ContainerInterface {
@@ -60,33 +53,20 @@ class Application
         }
     }
 
-    protected function bootstrap(): void
+    /**
+     * Get directories to scan for service providers
+     *
+     * Override this method to customize which directories are scanned.
+     * Directories are scanned in order, with first-found implementations taking priority.
+     *
+     * @return array List of directories to scan
+     */
+    protected function getServiceProviderDirectories(): array
     {
-        $this->container->set(SessionInterface::class, fn() => new Session());
-        $this->container->set(LoggerInterface::class, fn() => new FileLogger());
-        $this->container->set(EntityStorageInterface::class, fn() => new DoctrineStorage);
-        $this->container->set(EntitySearchInterface::class, fn() => new DoctrineStorage);
-        $this->container->set(Environment::class, function () {
-            $loader = new FilesystemLoader($this->getTemplatePath());
-            $twig = new Environment($loader);
-            $session = $this->container->get(SessionInterface::class);
-            $this->configureTwig($twig, $session);
-            return $twig;
-        });
-    }
-
-    protected function getTemplatePath(): string
-    {
-        return dirname(__DIR__) . "/templates";
-    }
-
-    protected function configureTwig(Environment $twig, SessionInterface $session): void
-    {
-        $twig->addExtension(new IntlExtension());
-        $twig->addExtension(new AccessControlExtension($session));
-        $twig->addGlobal('app', [
-            'session' => $session
-        ]);
+        return [
+            PathHelper::getBasedir() . '/src',
+            __DIR__,
+        ];
     }
 
     protected function checkAccess(object $controller, string $methodName): void
@@ -128,9 +108,6 @@ class Application
         return new ErrorController();
     }
 
-    /**
-     * Setup PHP error handler - override to customize error handling
-     */
     protected function setupErrorHandler(): void
     {
         set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
