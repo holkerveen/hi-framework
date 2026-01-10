@@ -3,6 +3,7 @@
 
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+use Hi\Application;
 use Hi\Commands\UserCreateCommand;
 use Hi\Storage\DoctrineStorage;
 use Hi\Storage\EntityStorageInterface;
@@ -16,11 +17,11 @@ else {
 
 
 try {
-    $application = new \Hi\Application();
+    $application = new Application();
 
     /** @var DoctrineStorage $doctrineStorage */
     $doctrineStorage = $application->getContainer()->get(EntityStorageInterface::class);
-    
+
     ConsoleRunner::run(
         new SingleManagerProvider($doctrineStorage->getEntityManager()),
         [

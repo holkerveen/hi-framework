@@ -28,7 +28,7 @@ class CsvStorage implements EntityStorageInterface
                 $property->setValue($instance, $line[$k]);
             }
             $result[] = $instance;
-        };
+        }
         return $result;
     }
 

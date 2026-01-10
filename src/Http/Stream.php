@@ -5,6 +5,7 @@ namespace Hi\Http;
 
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
+use Throwable;
 
 class Stream implements StreamInterface
 {
@@ -34,7 +35,7 @@ class Stream implements StreamInterface
                 $this->seek(0);
             }
             return $this->getContents();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return '';
         }
     }

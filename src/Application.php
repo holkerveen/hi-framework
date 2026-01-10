@@ -5,6 +5,7 @@ namespace Hi;
 
 use Closure;
 use ErrorException;
+use Exception;
 use Hi\Cache\CacheInterface;
 use Hi\Cache\Config;
 use Hi\Cache\FileCache;
@@ -15,6 +16,7 @@ use Hi\Http\ErrorResponse;
 use Hi\Http\Response;
 use Hi\Security\AccessControl;
 use Hi\Storage\DoctrineStorage;
+use Hi\Storage\EntitySearchInterface;
 use Hi\Storage\EntityStorageInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -28,7 +30,7 @@ class Application
     public function __construct()
     {
         $this->setupErrorHandler();
-        $this->container = new \Hi\Container();
+        $this->container = new Container();
         $this->container->register($this->services());
     }
 
@@ -41,6 +43,7 @@ class Application
             SessionInterface::class => Session::class,
             ViewInterface::class => TwigView::class,
             EntityStorageInterface::class => DoctrineStorage::class,
+            EntitySearchInterface::class => DoctrineStorage::class,
         ];
     }
 
@@ -96,7 +99,7 @@ class Application
         }
     }
 
-    protected function handleHighLevelErrors(Throwable|\Exception $throwable): ResponseInterface
+    protected function handleHighLevelErrors(Throwable|Exception $throwable): ResponseInterface
     {
         $injector = new Injector($this->container);
         // Properly handled errors do not need detailed logging
@@ -112,7 +115,7 @@ class Application
         );
     }
 
-    protected function handleLowLevelErrors(Throwable|\Exception $throwable): ResponseInterface
+    protected function handleLowLevelErrors(Throwable|Exception $throwable): ResponseInterface
     {
         error_log(
             "Uncaught Exception: {$throwable->getMessage()}"

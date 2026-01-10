@@ -2,6 +2,10 @@
 
 namespace Hi;
 
+use Composer\Autoload\ClassLoader;
+use ReflectionClass;
+use RuntimeException;
+
 class PathHelper
 {
     private static ?string $basedir = null;
@@ -19,7 +23,7 @@ class PathHelper
      * - Whether run as CLI or through composer serve
      *
      * @return string The absolute path to the project root directory
-     * @throws \RuntimeException If the project root cannot be determined
+     * @throws RuntimeException If the project root cannot be determined
      */
     public static function getBasedir(): string
     {
@@ -29,7 +33,7 @@ class PathHelper
 
         // Strategy 1: Check if we can find the project root via the vendor autoloader
         // The vendor autoloader is always in vendor/autoload.php relative to project root
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new ReflectionClass(ClassLoader::class);
         $vendorDir = dirname($reflection->getFileName(), 2);
         $projectRoot = dirname($vendorDir);
 
@@ -80,7 +84,7 @@ class PathHelper
             return self::$basedir;
         }
 
-        throw new \RuntimeException(
+        throw new RuntimeException(
             'Could not determine project root directory. ' .
             'Make sure composer.json requires "holkerveen/hi-framework".'
         );

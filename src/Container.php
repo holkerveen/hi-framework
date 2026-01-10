@@ -3,6 +3,7 @@
 
 namespace Hi;
 
+use Closure;
 use Exception;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -54,7 +55,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param array<class-string, class-string|\Closure> $services
+     * @param array<class-string, class-string|Closure> $services
      */
     public function register(array $services): void
     {
