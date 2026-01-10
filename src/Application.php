@@ -5,6 +5,7 @@ namespace Hi;
 
 use Closure;
 use ErrorException;
+use Hi\Cache\CacheInterface;
 use Hi\Controllers\ErrorController;
 use Hi\Exceptions\HttpNotFoundException;
 use Hi\Exceptions\HttpUnauthenticatedException;
@@ -35,7 +36,8 @@ class Application
     {
         try {
             try {
-                $router = new Router()->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+                $cache = $this->container->get(CacheInterface::class);
+                $router = new CachedRouter($cache)->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $this->checkAccess($router->getControllerInstance(), $router->getMethod());
 
                 $closure = Closure::fromCallable([

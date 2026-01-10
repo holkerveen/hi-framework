@@ -10,7 +10,7 @@ use ReflectionMethod;
 
 class Router
 {
-    private array $routes = [];
+    protected array $routes = [];
     private string|null $matchedRouteKey = null;
     private array $parameters = [];
 
