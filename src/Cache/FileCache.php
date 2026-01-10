@@ -3,15 +3,13 @@
 
 namespace Hi\Cache;
 
-use Hi\PathHelper;
-
 class FileCache implements CacheInterface
 {
     private string $cacheDirectory;
 
-    public function __construct()
+    public function __construct(Config $config)
     {
-        $this->cacheDirectory = PathHelper::getBasedir() . '/var/cache';
+        $this->cacheDirectory = $config['cache']['directory'];
     }
 
     public function get(string $key, mixed $default = null): mixed

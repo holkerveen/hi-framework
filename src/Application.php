@@ -6,6 +6,7 @@ namespace Hi;
 use Closure;
 use ErrorException;
 use Hi\Cache\CacheInterface;
+use Hi\Cache\Config;
 use Hi\Cache\FileCache;
 use Hi\Controllers\ErrorController;
 use Hi\Exceptions\HttpNotFoundException;
@@ -34,6 +35,7 @@ class Application
     protected function services(): array {
         return [
             InjectorInterface::class => fn() => new Injector($this->container),
+            Config::class => fn() => new Config(),
             LoggerInterface::class => FileLogger::class,
             CacheInterface::class => FileCache::class,
             SessionInterface::class => Session::class,
