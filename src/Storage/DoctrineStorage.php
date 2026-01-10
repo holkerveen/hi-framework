@@ -5,19 +5,33 @@ namespace Hi\Storage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
+use Hi\Cache\Config;
 use Hi\Exceptions\HttpNotFoundException;
 use Hi\PathHelper;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
 {
     private EntityManager $em;
 
-    public function __construct()
+    public function __construct(Config $appConfig)
     {
-        $config = ORMSetup::createAttributeMetadataConfig(paths: [
-            getcwd() . "/src/Entity",
-            getcwd() . "/vendor/holkerveen/hi-framework/src/Entity",
-        ]);
+        $cache = new PhpFilesAdapter(
+            namespace: 'doctrine',
+            directory: $appConfig['cache']['directory'] . '/doctrine'
+        );
+        $config = ORMSetup::createAttributeMetadataConfig(
+            paths: [
+                getcwd() . "/src/Entity",
+                getcwd() . "/vendor/holkerveen/hi-framework/src/Entity",
+            ],
+            isDevMode: false,
+            cache: $cache
+        );
+        // Enable query and result caching
+        $config->setQueryCache($cache);
+        $config->setResultCache($cache);
+
         $config->enableNativeLazyObjects(true);
 
         $connection = DriverManager::getConnection([

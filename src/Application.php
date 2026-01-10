@@ -53,13 +53,13 @@ class Application
         try {
             try {
                 $cache = $this->container->get(CacheInterface::class);
-                $router = new CachedRouter($cache)->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-                $this->checkAccess($router->getControllerInstance(), $router->getMethod());
+                $router = new CachedRouter($cache);
+                $router->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+                $controllerInstance = $router->getControllerInstance();
+                $method = $router->getMethod();
+                $this->checkAccess($controllerInstance, $method);
 
-                $closure = Closure::fromCallable([
-                    $router->getControllerInstance(),
-                    $router->getMethod(),
-                ]);
+                $closure = Closure::fromCallable([$controllerInstance, $method]);
 
                 $response = new Injector($this->container)->call($closure, $router->getParameters());
                 return $response instanceof Response ? $response: new Response($response);

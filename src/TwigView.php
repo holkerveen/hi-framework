@@ -2,6 +2,7 @@
 
 namespace Hi;
 
+use Hi\Cache\Config;
 use Hi\Twig\AccessControlExtension;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
@@ -11,10 +12,12 @@ class TwigView implements ViewInterface
 {
     private Environment $twig;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(SessionInterface $session, Config $config)
     {
         $loader = new FilesystemLoader($this->getTemplatePath());
-        $this->twig = new Environment($loader);
+        $this->twig = new Environment($loader, [
+            'cache' => $config['cache']['directory'] . '/twig',
+        ]);
         $this->configureTwig($this->twig, $session);
     }
 
