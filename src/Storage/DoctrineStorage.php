@@ -18,7 +18,7 @@ class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
     {
         $cache = new PhpFilesAdapter(
             namespace: 'doctrine',
-            directory: $appConfig['cache']['directory'] . '/doctrine'
+            directory: $appConfig['cache']['directory']
         );
         $config = ORMSetup::createAttributeMetadataConfig(
             paths: [
