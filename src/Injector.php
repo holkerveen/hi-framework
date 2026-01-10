@@ -5,10 +5,12 @@ namespace Hi;
 
 use Closure;
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionNamedType;
 
-readonly class Injector
+readonly class Injector implements InjectorInterface
 {
     public function __construct(private ContainerInterface $container)
     {
@@ -23,6 +25,27 @@ readonly class Injector
                 $extraParams,
             )
         );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function construct(string $id, array $extraParameters = []): object
+    {
+        $reflection = new ReflectionClass($id);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor === null) {
+            echo "Inject id $id??";
+            return new $id();
+        }
+
+        $dependencies = $this->getDependencies(
+            $constructor->getParameters(),
+            $extraParameters
+        );
+
+        return $reflection->newInstanceArgs($dependencies);
     }
 
     private function getDependencies(array $parameters, array $extraParams): array

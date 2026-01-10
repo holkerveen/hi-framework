@@ -2,13 +2,11 @@
 
 namespace Hi;
 
-use Hi\Attributes\Service;
 use Hi\Twig\AccessControlExtension;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader;
 
-#[Service]
 class TwigView implements ViewInterface
 {
     private Environment $twig;

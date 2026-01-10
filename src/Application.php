@@ -6,12 +6,15 @@ namespace Hi;
 use Closure;
 use ErrorException;
 use Hi\Cache\CacheInterface;
+use Hi\Cache\FileCache;
 use Hi\Controllers\ErrorController;
 use Hi\Exceptions\HttpNotFoundException;
 use Hi\Exceptions\HttpUnauthenticatedException;
 use Hi\Http\ErrorResponse;
 use Hi\Http\Response;
 use Hi\Security\AccessControl;
+use Hi\Storage\DoctrineStorage;
+use Hi\Storage\EntityStorageInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -25,9 +28,20 @@ class Application
     {
         $this->setupErrorHandler();
         $this->container = new \Hi\Container();
-        $this->container->scan($this->getServiceProviderDirectories());
+        $this->container->register($this->services());
     }
-    
+
+    protected function services(): array {
+        return [
+            InjectorInterface::class => fn() => new Injector($this->container),
+            LoggerInterface::class => FileLogger::class,
+            CacheInterface::class => FileCache::class,
+            SessionInterface::class => Session::class,
+            ViewInterface::class => TwigView::class,
+            EntityStorageInterface::class => DoctrineStorage::class,
+        ];
+    }
+
     public function getContainer(): ContainerInterface {
         return $this->container;
     }

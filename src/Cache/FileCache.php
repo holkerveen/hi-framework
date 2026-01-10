@@ -3,10 +3,8 @@
 
 namespace Hi\Cache;
 
-use Hi\Attributes\Service;
 use Hi\PathHelper;
 
-#[Service]
 class FileCache implements CacheInterface
 {
     private string $cacheDirectory;

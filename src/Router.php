@@ -20,7 +20,7 @@ class Router
             glob(PathHelper::getBasedir() . '/src/Controllers/*.php'),
             glob(__DIR__ . '/Controllers/*.php'),
         ));
-        
+
         foreach ($controllerFiles as $file) {
             $className = 'Hi\\Controllers\\' . basename($file, '.php');
 
@@ -44,7 +44,7 @@ class Router
     {
         return new $this->routes[$this->matchedRouteKey]['controller'];
     }
-    
+
     public function getMethod(): string
     {
         return $this->routes[$this->matchedRouteKey]['method'];
@@ -59,7 +59,7 @@ class Router
         $this->parameters = self::getRequestParametersForRoutePath($this->routes[$this->matchedRouteKey]['path'], $requestPath);
         return $this;
     }
-    
+
     public function getParameters(): array {
         return $this->parameters;
     }

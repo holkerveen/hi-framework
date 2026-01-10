@@ -5,11 +5,9 @@ namespace Hi\Storage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
-use Hi\Attributes\Service;
 use Hi\Exceptions\HttpNotFoundException;
 use Hi\PathHelper;
 
-#[Service]
 class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
 {
     private EntityManager $em;
