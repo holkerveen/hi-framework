@@ -45,6 +45,10 @@ class Application
             ViewInterface::class => TwigView::class,
             EntityStorageInterface::class => DoctrineStorage::class,
             EntitySearchInterface::class => DoctrineStorage::class,
+            Router::class => fn() => new Router(
+                $this->container->get(CacheInterface::class),
+                PathHelper::getBasedir() . '/src/Controllers/*.php'
+            ),
         ];
     }
 
@@ -56,8 +60,7 @@ class Application
     {
         try {
             try {
-                $cache = $this->container->get(CacheInterface::class);
-                $router = new Router($cache);
+                $router = $this->container->get(Router::class);
                 $router->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $controllerInstance = $router->getControllerInstance();
                 $method = $router->getMethod();

@@ -17,11 +17,18 @@ class Router
     protected array $routes = [];
     private string|null $matchedRouteKey = null;
     private array $parameters = [];
+    private array $controllerFiles;
 
-    public function __construct(private CacheInterface $cache)
+    public function __construct(private CacheInterface $cache, string|array $controllerGlobs)
     {
-        $controllerFiles = $this->getControllerFiles();
-        $metadata = $this->buildMetadata($controllerFiles);
+        $this->controllerFiles = is_string($controllerGlobs)
+            ? glob($controllerGlobs)
+            : array_unique(
+                array_merge(
+                    array_map(fn($file) => glob($file), $controllerGlobs)
+                )
+            );
+        $metadata = $this->buildMetadata();
 
         if ($this->cache->isValid(self::CACHE_KEY, $metadata)) {
             $this->routes = $this->cache->get(self::CACHE_KEY, []);
@@ -31,18 +38,10 @@ class Router
         }
     }
 
-    protected function getControllerFiles(): array
-    {
-        return array_unique(array_merge(
-            glob(PathHelper::getBasedir() . '/src/Controllers/*.php'),
-            glob(__DIR__ . '/Controllers/*.php'),
-        ));
-    }
-
-    private function buildMetadata(array $controllerFiles): array
+    private function buildMetadata(): array
     {
         $files = [];
-        foreach ($controllerFiles as $file) {
+        foreach ($this->controllerFiles as $file) {
             $files[$file] = filemtime($file);
         }
 
@@ -53,7 +52,7 @@ class Router
     {
         $routes = [];
 
-        foreach ($this->getControllerFiles() as $file) {
+        foreach ($this->controllerFiles as $file) {
             $className = 'Hi\\Controllers\\' . basename($file, '.php');
 
             foreach (new ReflectionClass($className)->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
@@ -86,15 +85,22 @@ class Router
 
     public function match(false|array|int|string|null $requestPath): static
     {
-        $this->matchedRouteKey = array_find_key($this->routes, fn($route, $regex) => self::testRequestPathAgainstRegex($requestPath, $regex));
-        if(!$this->matchedRouteKey) {
+        $this->matchedRouteKey = array_find_key(
+            $this->routes,
+            fn($route, $regex) => self::testRequestPathAgainstRegex($requestPath, $regex)
+        );
+        if (!$this->matchedRouteKey) {
             throw new HttpNotFoundException("The URL '$requestPath' was not found");
         }
-        $this->parameters = self::getRequestParametersForRoutePath($this->routes[$this->matchedRouteKey]['path'], $requestPath);
+        $this->parameters = self::getRequestParametersForRoutePath(
+            $this->routes[$this->matchedRouteKey]['path'],
+            $requestPath
+        );
         return $this;
     }
 
-    public function getParameters(): array {
+    public function getParameters(): array
+    {
         return $this->parameters;
     }
 
