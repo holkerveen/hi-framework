@@ -23,9 +23,9 @@ class DoctrineStorage implements EntityStorageInterface, EntitySearchInterface
         $config = ORMSetup::createAttributeMetadataConfig(
             paths: [
                 getcwd() . "/src/Entity",
-                getcwd() . "/vendor/holkerveen/hi-framework/src/Entity",
+                getcwd() . "/vendor/holkerveen/hi-framework/src/Auth",
             ],
-            isDevMode: false,
+            isDevMode: $config['debug'] ?? false,
             cache: $cache
         );
         // Enable query and result caching

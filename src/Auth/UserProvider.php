@@ -17,5 +17,6 @@ class UserProvider implements UserProviderInterface
     public function persist(UserInterface $user): static
     {
         $this->entityStorage->create($user);
+        return $this;
     }
 }

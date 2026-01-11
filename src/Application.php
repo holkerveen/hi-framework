@@ -6,6 +6,8 @@ namespace Hi;
 use Closure;
 use ErrorException;
 use Exception;
+use Hi\Auth\UserProvider;
+use Hi\Auth\UserProviderInterface;
 use Hi\Cache\CacheInterface;
 use Hi\Cache\FileCache;
 use Hi\Controllers\ErrorController;
@@ -46,6 +48,7 @@ class Application
             EntityStorageInterface::class => DoctrineStorage::class,
             EntitySearchInterface::class => DoctrineStorage::class,
             RouterInterface::class => Router::class,
+            UserProviderInterface::class => UserProvider::class,
         ];
     }
 
