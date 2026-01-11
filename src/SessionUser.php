@@ -2,7 +2,7 @@
 
 namespace Hi;
 
-use Hi\Entity\User;
+use Hi\Auth\UserInterface;
 
 /**
  * Plain PHP object for storing user data in sessions
@@ -12,18 +12,20 @@ class SessionUser
 {
     public function __construct(
         public readonly string $id,
-        public readonly string $email,
+        public readonly string $clientIdentifier,
+        public readonly string $clientSecret,
     ) {
     }
 
     /**
      * Create a SessionUser from a User entity
      */
-    public static function fromUser(User $user): self
+    public static function fromUser(UserInterface $user): self
     {
         return new self(
             id: $user->getId(),
-            email: $user->getEmail(),
+            clientIdentifier: $user->getClientIdentifier(),
+            clientSecret: $user->getClientSecret(),
         );
     }
 }

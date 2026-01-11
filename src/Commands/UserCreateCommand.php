@@ -3,7 +3,8 @@
 namespace Hi\Commands;
 
 use Exception;
-use Hi\Entity\User;
+use Hi\Auth\UserInterface;
+use Hi\Auth\UserProviderInterface;
 use Hi\Storage\EntityStorageInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -48,13 +49,13 @@ class UserCreateCommand extends Command
             throw new Exception("Invalid email format.\n");
         }
 
-        $user = new User();
-        $user->setEmail($email);
-        $user->setPassword($password);
+        /** @var UserProviderInterface $userProvider */
+        $userProvider = $this->container->get(UserProviderInterface::class);
 
-        /** @var EntityStorageInterface $store */
-        $store = $this->container->get(EntityStorageInterface::class);
-        $store->create($user);
+        $user = $userProvider->create();
+        $user->setClientIdentifier($email);
+        $user->setClientSecret($password);
+        $userProvider->persist($user);
 
         return 0;
     }
