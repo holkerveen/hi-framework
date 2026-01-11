@@ -2,7 +2,7 @@
 
 namespace Hi\Twig;
 
-use Hi\Http\Router;
+use Hi\Http\RouterInterface;
 use Hi\Security\AccessControl;
 use Hi\SessionInterface;
 use Throwable;
@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 
 class AccessControlExtension extends AbstractExtension
 {
-    public function __construct(private SessionInterface $session, private Router $router)
+    public function __construct(private SessionInterface $session, private RouterInterface $router)
     {
     }
 

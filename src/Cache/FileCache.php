@@ -3,6 +3,8 @@
 
 namespace Hi\Cache;
 
+use Hi\Config;
+
 class FileCache implements CacheInterface
 {
     private string $cacheDirectory;

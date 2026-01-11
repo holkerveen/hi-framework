@@ -7,7 +7,6 @@ use Closure;
 use ErrorException;
 use Exception;
 use Hi\Cache\CacheInterface;
-use Hi\Cache\Config;
 use Hi\Cache\FileCache;
 use Hi\Controllers\ErrorController;
 use Hi\Exceptions\HttpNotFoundException;
@@ -15,6 +14,7 @@ use Hi\Exceptions\HttpUnauthenticatedException;
 use Hi\Http\ErrorResponse;
 use Hi\Http\Response;
 use Hi\Http\Router;
+use Hi\Http\RouterInterface;
 use Hi\Security\AccessControl;
 use Hi\Storage\DoctrineStorage;
 use Hi\Storage\EntitySearchInterface;
@@ -45,10 +45,7 @@ class Application
             ViewInterface::class => TwigView::class,
             EntityStorageInterface::class => DoctrineStorage::class,
             EntitySearchInterface::class => DoctrineStorage::class,
-            Router::class => fn() => new Router(
-                $this->container->get(CacheInterface::class),
-                PathHelper::getBasedir() . '/src/Controllers/*.php'
-            ),
+            RouterInterface::class => Router::class,
         ];
     }
 
@@ -60,7 +57,7 @@ class Application
     {
         try {
             try {
-                $router = $this->container->get(Router::class);
+                $router = $this->container->get(RouterInterface::class);
                 $router->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $controllerInstance = $router->getControllerInstance();
                 $method = $router->getMethod();

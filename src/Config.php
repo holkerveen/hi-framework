@@ -1,10 +1,9 @@
 <?php
 
-namespace Hi\Cache;
+namespace Hi;
 
 use ArrayAccess;
 use Exception;
-use Hi\PathHelper;
 
 class Config implements ArrayAccess
 {

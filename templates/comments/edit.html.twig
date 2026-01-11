@@ -1,6 +1,0 @@
-{% extends "with-navigation.html.twig" %}
-
-{% block content %}
-    <h1>Edit comment</h1>
-    {{ include('comments/form.html.twig', { comment, action: '/comments/' ~ comment.id ~ '/store' }) }}
-{% endblock %}

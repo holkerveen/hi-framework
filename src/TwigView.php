@@ -2,7 +2,7 @@
 
 namespace Hi;
 
-use Hi\Cache\Config;
+use Hi\Security\AccessControl;
 use Hi\Twig\AccessControlExtension;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
@@ -12,9 +12,16 @@ class TwigView implements ViewInterface
 {
     private Environment $twig;
 
-    public function __construct(SessionInterface $session, Config $config)
+    public function __construct(
+        SessionInterface $session,
+        Config $config,
+        private readonly InjectorInterface $dependencyInjector,
+    )
     {
-        $loader = new FilesystemLoader($this->getTemplatePath());
+        $loader = new FilesystemLoader([
+            $config['view']['template']['directory'],
+            __DIR__.'/../templates',
+        ]);
         $this->twig = new Environment($loader, [
             'cache' => $config['cache']['directory'] . '/twig',
         ]);
@@ -31,15 +38,10 @@ class TwigView implements ViewInterface
         return $this->twig;
     }
 
-    protected function getTemplatePath(): string
-    {
-        return dirname(__DIR__) . "/templates";
-    }
-
     protected function configureTwig(Environment $twig, SessionInterface $session): void
     {
         $twig->addExtension(new IntlExtension());
-        $twig->addExtension(new AccessControlExtension($session));
+        $twig->addExtension($this->dependencyInjector->construct(AccessControlExtension::class));
         $twig->addGlobal('app', [
             'session' => $session
         ]);

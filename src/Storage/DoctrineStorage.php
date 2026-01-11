@@ -5,7 +5,7 @@ namespace Hi\Storage;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
-use Hi\Cache\Config;
+use Hi\Config;
 use Hi\Exceptions\HttpNotFoundException;
 use Hi\PathHelper;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;

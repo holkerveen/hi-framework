@@ -5,12 +5,12 @@ namespace Hi\Http;
 
 use Hi\Attributes\Route;
 use Hi\Cache\CacheInterface;
+use Hi\Config;
 use Hi\Exceptions\HttpNotFoundException;
-use Hi\PathHelper;
 use ReflectionClass;
 use ReflectionMethod;
 
-class Router
+class Router implements RouterInterface
 {
     private const string CACHE_KEY = 'routes';
 
@@ -19,22 +19,16 @@ class Router
     private array $parameters = [];
     private array $controllerFiles;
 
-    public function __construct(private CacheInterface $cache, string|array $controllerGlobs)
+    public function __construct(CacheInterface $cache, Config $config)
     {
-        $this->controllerFiles = is_string($controllerGlobs)
-            ? glob($controllerGlobs)
-            : array_unique(
-                array_merge(
-                    array_map(fn($file) => glob($file), $controllerGlobs)
-                )
-            );
+        $this->controllerFiles = glob($config['router']['glob']);
         $metadata = $this->buildMetadata();
 
-        if ($this->cache->isValid(self::CACHE_KEY, $metadata)) {
-            $this->routes = $this->cache->get(self::CACHE_KEY, []);
+        if ($cache->isValid(self::CACHE_KEY, $metadata)) {
+            $this->routes = $cache->get(self::CACHE_KEY, []);
         } else {
             $this->routes = $this->buildRoutes();
-            $this->cache->set(self::CACHE_KEY, $this->routes, $metadata);
+            $cache->set(self::CACHE_KEY, $this->routes, $metadata);
         }
     }
 
@@ -48,7 +42,7 @@ class Router
         return ['files' => $files];
     }
 
-    public function buildRoutes()
+    private function buildRoutes()
     {
         $routes = [];
 

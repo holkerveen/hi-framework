@@ -1,6 +1,0 @@
-{% extends "with-navigation.html.twig" %}
-
-{% block content %}
-    <h1>Edit user</h1>
-    {{ include('users/form.html.twig', { user, action: '/users/' ~ user.id ~ '/put' }) }}
-{% endblock %}
