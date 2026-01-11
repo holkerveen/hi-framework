@@ -1,27 +1,59 @@
 <?php
 // src/Router.php
 
-namespace Hi;
+namespace Hi\Http;
 
 use Hi\Attributes\Route;
+use Hi\Cache\CacheInterface;
 use Hi\Exceptions\HttpNotFoundException;
+use Hi\PathHelper;
 use ReflectionClass;
 use ReflectionMethod;
 
 class Router
 {
+    private const string CACHE_KEY = 'routes';
+
     protected array $routes = [];
     private string|null $matchedRouteKey = null;
     private array $parameters = [];
 
-    public function __construct()
+    public function __construct(private CacheInterface $cache)
     {
-        $controllerFiles = array_unique(array_merge(
+        $controllerFiles = $this->getControllerFiles();
+        $metadata = $this->buildMetadata($controllerFiles);
+
+        if ($this->cache->isValid(self::CACHE_KEY, $metadata)) {
+            $this->routes = $this->cache->get(self::CACHE_KEY, []);
+        } else {
+            $this->routes = $this->buildRoutes();
+            $this->cache->set(self::CACHE_KEY, $this->routes, $metadata);
+        }
+    }
+
+    protected function getControllerFiles(): array
+    {
+        return array_unique(array_merge(
             glob(PathHelper::getBasedir() . '/src/Controllers/*.php'),
             glob(__DIR__ . '/Controllers/*.php'),
         ));
+    }
 
+    private function buildMetadata(array $controllerFiles): array
+    {
+        $files = [];
         foreach ($controllerFiles as $file) {
+            $files[$file] = filemtime($file);
+        }
+
+        return ['files' => $files];
+    }
+
+    public function buildRoutes()
+    {
+        $routes = [];
+
+        foreach ($this->getControllerFiles() as $file) {
             $className = 'Hi\\Controllers\\' . basename($file, '.php');
 
             foreach (new ReflectionClass($className)->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
@@ -30,7 +62,7 @@ class Router
                 foreach ($attributes as $attribute) {
                     $route = $attribute->newInstance();
 
-                    $this->routes[self::getRegexForRoutePath($route->path)] = [
+                    $routes[self::getRegexForRoutePath($route->path)] = [
                         'controller' => $className,
                         'method' => $method->getName(),
                         'path' => $route->path,
@@ -38,6 +70,8 @@ class Router
                 }
             }
         }
+
+        return $routes;
     }
 
     public function getControllerInstance(): object

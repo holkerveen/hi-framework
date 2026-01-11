@@ -14,6 +14,7 @@ use Hi\Exceptions\HttpNotFoundException;
 use Hi\Exceptions\HttpUnauthenticatedException;
 use Hi\Http\ErrorResponse;
 use Hi\Http\Response;
+use Hi\Http\Router;
 use Hi\Security\AccessControl;
 use Hi\Storage\DoctrineStorage;
 use Hi\Storage\EntitySearchInterface;
@@ -56,7 +57,7 @@ class Application
         try {
             try {
                 $cache = $this->container->get(CacheInterface::class);
-                $router = new CachedRouter($cache);
+                $router = new Router($cache);
                 $router->match(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
                 $controllerInstance = $router->getControllerInstance();
                 $method = $router->getMethod();

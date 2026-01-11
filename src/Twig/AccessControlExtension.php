@@ -2,7 +2,7 @@
 
 namespace Hi\Twig;
 
-use Hi\Router;
+use Hi\Http\Router;
 use Hi\Security\AccessControl;
 use Hi\SessionInterface;
 use Throwable;
