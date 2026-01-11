@@ -2,7 +2,6 @@
 
 namespace Hi;
 
-use Hi\Security\AccessControl;
 use Hi\Twig\AccessControlExtension;
 use Twig\Environment;
 use Twig\Extra\Intl\IntlExtension;
@@ -24,6 +23,7 @@ class TwigView implements ViewInterface
         ]);
         $this->twig = new Environment($loader, [
             'cache' => $config['cache']['directory'] . '/twig',
+            'debug' => $config['debug'] ?? false,
         ]);
         $this->configureTwig($this->twig, $session);
     }

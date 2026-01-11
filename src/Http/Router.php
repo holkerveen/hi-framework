@@ -47,7 +47,11 @@ class Router implements RouterInterface
         $routes = [];
 
         foreach ($this->controllerFiles as $file) {
-            $className = 'Hi\\Controllers\\' . basename($file, '.php');
+            $className = $this->getClassNameFromFile($file);
+
+            if (!$className) {
+                continue;
+            }
 
             foreach (new ReflectionClass($className)->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
                 $attributes = $method->getAttributes(Route::class);
@@ -65,6 +69,45 @@ class Router implements RouterInterface
         }
 
         return $routes;
+    }
+
+    private function getClassNameFromFile(string $file): ?string
+    {
+        $content = file_get_contents($file);
+        $tokens = token_get_all($content);
+
+        $namespace = '';
+        $class = '';
+
+        for ($i = 0; $i < count($tokens); $i++) {
+            if (is_array($tokens[$i]) && $tokens[$i][0] === T_NAMESPACE) {
+                // Extract namespace
+                for ($j = $i + 1; $j < count($tokens); $j++) {
+                    if (is_array($tokens[$j]) && in_array($tokens[$j][0], [T_STRING, T_NAME_QUALIFIED])) {
+                        $namespace .= $tokens[$j][1];
+                    } elseif ($tokens[$j] === ';') {
+                        break;
+                    }
+                }
+            }
+
+            if (is_array($tokens[$i]) && $tokens[$i][0] === T_CLASS) {
+                // Extract class name
+                for ($j = $i + 1; $j < count($tokens); $j++) {
+                    if (is_array($tokens[$j]) && $tokens[$j][0] === T_STRING) {
+                        $class = $tokens[$j][1];
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        if ($class) {
+            return $namespace ? $namespace . '\\' . $class : $class;
+        }
+
+        return null;
     }
 
     public function getControllerInstance(): object
