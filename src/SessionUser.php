@@ -13,7 +13,6 @@ class SessionUser
     public function __construct(
         public readonly string $id,
         public readonly string $clientIdentifier,
-        public readonly string $clientSecret,
     ) {
     }
 
@@ -25,7 +24,6 @@ class SessionUser
         return new self(
             id: $user->getId(),
             clientIdentifier: $user->getClientIdentifier(),
-            clientSecret: $user->getClientSecret(),
         );
     }
 }
